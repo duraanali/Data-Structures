@@ -1,5 +1,6 @@
 """Each ListNode holds a reference to its previous node
 as well as its next node in the List."""
+import queue
 
 
 class ListNode:
@@ -156,122 +157,60 @@ class DoublyLinkedList:
 # --------------------------------------------
 
 
-class QNode(object):
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-        self.prev = None
-        self.next = None
-
-    def __str__(self):
-        return "(%s, %s)" % (self.key, self.value)
+class Node:
+    def __init__(self, value):
+        self.value = value  # Assign data
+        self.next = None  # Initialize next as null
+        self.prev = None  # Initialize prev as null
 
 
-class LRUCache:
-    """
-    Our LRUCache class keeps track of the max number of nodes it
-    can hold, the current number of nodes it is holding, a doubly-
-    linked list that holds the key-value entries in the correct
-    order, as well as a storage dict that provides fast access
-    to every node stored in the cache.
-    """
-
-    def __init__(self, limit):
-
-        if limit <= 0:
-            raise ValueError("limit > 0")
-        self.hash_map = {}
+class Stack:
+    def __init__(self):
 
         self.head = None
-        self.end = None
+        # Why is our DLL a good choice to store our elements?
+        # self.storage = ?
 
-        self.limit = limit
-        self.current_size = 0
+    def push(self, value):
+        if self.head is None:
+            self.head = Node(value)
+        else:
+            new_node = Node(value)
+            self.head.prev = new_node
+            new_node.next = self.head
+            new_node.prev = None
+            self.head = new_node
 
-    """
-    Retrieves the value associated with the given key. Also
-    needs to move the key-value pair to the end of the order
-    such that the pair is considered most-recently used.
-    Returns the value associated with the key or None if the
-    key-value pair doesn't exist in the cache.
-    """
-
-    def get(self, key):
-
-        if key not in self.hash_map:
+    def pop(self):
+        if self.head is None:
             return None
-
-        node = self.hash_map[key]
-
-        if self.head == node:
-            return node.value
-        self.remove(node)
-        self.set_head(node)
-        return node.value
-
-    """
-    Adds the given key-value pair to the cache. The newly-
-    added pair should be considered the most-recently used
-    entry in the cache. If the cache is already at max capacity
-    before this entry is added, then the oldest entry in the
-    cache needs to be removed to make room. Additionally, in the
-    case that the key already exists in the cache, we simply
-    want to overwrite the old value associated with the key with
-    the newly-specified value.
-    """
-
-    def set(self, key, value):
-
-        if key in self.hash_map:
-            node = self.hash_map[key]
-            node.value = value
-
-            if self.head != node:
-                self.remove(node)
-                self.set_head(node)
         else:
-            new_node = QNode(key, value)
-            if self.current_size == self.limit:
-                del self.hash_map[self.end.key]
-                self.remove(self.end)
-            self.set_head(new_node)
-            self.hash_map[key] = new_node
+            temp = self.head.value
+            self.head = self.head.next
+            return temp
 
-    # PRIVATE
+    def top(self):
+        return self.head.value
 
-    def set_head(self, node):
-        if not self.head:
-            self.head = node
-            self.end = node
+    def isEmpty(self):
+
+        if self.head is None:
+            return True
         else:
-            node.prev = self.head
-            self.head.next = node
-            self.head = node
-        self.current_size += 1
+            return False
 
-    def remove(self, node):
-        if not self.head:
-            return
+    def len(self):
+        temp = self.head
+        count = 0
+        while temp is not None:
+            count = count + 1
+            temp = temp.next
+        return count
 
-        if node.prev:
-            node.prev.next = node.next
-        if node.next:
-            node.next.prev = node.prev
+    def printstack(self):
 
-        if not node.next and not node.prev:
-            self.head = None
-            self.end = None
-
-        if self.end == node:
-            self.end = node.next
-            self.end.prev = None
-        self.current_size -= 1
-        return node
-
-    def print_elements(self):
-        n = self.head
-        print("[head = %s, end = %s]" % (self.head, self.end), end=" ")
-        while n:
-            print("%s -> " % (n), end="")
-            n = n.prev
-        print("NULL")
+        print("stack elements are:")
+        temp = self.head
+        while temp is not None:
+            print(temp.data, end="->")
+            temp = temp.next
